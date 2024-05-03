@@ -18,6 +18,7 @@ import { useMediaQuery } from "lib/hooks/useMediaQuery";
 import SEO from "layouts/SEO/SEO";
 import { StarSearchFeedbackAnalytic, useStarSearchFeedback } from "lib/hooks/useStarSearchFeedback";
 import { useToast } from "lib/hooks/useToast";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const HEIGHT_TO_TAKE_OFF_SCROLL_AREA = 340;
 
@@ -259,14 +260,27 @@ export default function StarSearchPage({ userId, bearerToken, ogImageUrl }: Star
                 >
                   <XCircleIcon className="w-6 h-6" aria-label="Close suggestions" />
                 </button>
-                <SuggestionBoxes
-                  isHorizontal
-                  addPromptInput={(prompt) => {
-                    addPromptInput(prompt);
-                    setShowSuggestions(false);
-                  }}
-                  suggestions={SUGGESTIONS}
-                />
+                <Carousel className="w-full max-w-xs">
+                  <CarouselContent>
+                    {SUGGESTIONS.map(({ prompt, title }) => (
+                      <CarouselItem key={title}>
+                        <button
+                          onClick={() => {
+                            addPromptInput(prompt);
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          <Card className="w-[30rem] snap-start shadow-md border-none text-start !p-6 text-slate-600">
+                            <h3 className="text-sm lg:text-base font-semibold">{title}</h3>
+                            <p className="text-xs lg:text-sm">{prompt}</p>
+                          </Card>
+                        </button>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
               </div>
             )}
           </>
