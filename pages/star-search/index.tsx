@@ -162,7 +162,7 @@ function StarSearchWidget({ widgetDefinition }: { widgetDefinition: WidgetDefini
     }
 
     return (
-      <div className="w-full lg:w-1/2 mx-auto pt-2" style={{ maxWidth: "440px" }}>
+      <div className="w-full lg:w-1/2" style={{ maxWidth: "440px" }}>
         {componentToRender}
       </div>
     );

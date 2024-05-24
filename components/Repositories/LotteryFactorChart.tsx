@@ -20,6 +20,7 @@ type LotteryFactorChartProps = {
   error: Error | undefined;
   range: DayRange;
   className?: string;
+  border?: boolean;
 };
 
 export default function LotteryFactorChart({
@@ -28,6 +29,7 @@ export default function LotteryFactorChart({
   error,
   range,
   className,
+  border = true,
 }: LotteryFactorChartProps) {
   const [hovered, setHovered] = useState<string | undefined>(undefined);
   const topFourContributors = lotteryFactor?.all_contribs.slice(0, 4) ?? [];
@@ -94,8 +96,10 @@ export default function LotteryFactorChart({
     }
   }
 
+  const Component = border ? Card : "div";
+
   return (
-    <Card className={`${className ?? ""} flex flex-col gap-4 w-full h-full items-center pt-8`}>
+    <Component className={`${className ?? ""} flex flex-col gap-4 w-full h-full items-center pt-8`}>
       <section className="flex flex-col lg:flex-row w-full items-start lg:items-center gap-4 lg:justify-between px-4">
         <header className="flex w-full justify-between items-center">
           <div className="flex gap-2 items-center">
@@ -242,6 +246,6 @@ export default function LotteryFactorChart({
           </tbody>
         </table>
       ) : null}
-    </Card>
+    </Component>
   );
 }

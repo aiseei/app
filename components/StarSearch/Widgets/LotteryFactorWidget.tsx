@@ -15,7 +15,14 @@ const LotteryFactorWidget = ({ repoName }: LotteryFactorWidgetProps) => {
     throw error;
   }
 
-  return <LotteryFactorChart lotteryFactor={data} isLoading={isLoading} error={error} range={range} />;
+  return (
+    <>
+      <p>
+        Lottery factor for the <span className="font-semibold">{repoName}</span> repository.
+      </p>
+      <LotteryFactorChart lotteryFactor={data} isLoading={isLoading} error={error} range={range} border={false} />
+    </>
+  );
 };
 
 export default LotteryFactorWidget;
