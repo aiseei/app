@@ -1,5 +1,3 @@
-import { GetServerSidePropsContext } from "next";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { MdOutlineSubdirectoryArrowRight } from "react-icons/md";
 import { Fragment, useEffect, useRef, useState } from "react";
 
@@ -66,8 +64,8 @@ interface ChatAvatarProps {
 }
 
 function ChatAvatar({ author, userId }: ChatAvatarProps) {
-  switch (author) {
-    case "You":
+  switch (true) {
+    case author === "You" && userId != null:
       return (
         <Image
           src={getAvatarById(`${userId}`)}
@@ -77,7 +75,7 @@ function ChatAvatar({ author, userId }: ChatAvatarProps) {
           className="w-8 h-8 lg:w-10 lg:h-10 rounded-full"
         />
       );
-    case "StarSearch":
+    case author === "StarSearch":
       return (
         <div className="bg-gradient-to-br from-sauced-orange to-amber-400 px-1.5 py-1 lg:p-2 rounded-full w-max">
           <Image
@@ -120,24 +118,7 @@ async function updateComponentRegistry(name: string) {
   }
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createPagesServerClient(context);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const userId = Number(session?.user.user_metadata.sub);
-
-  const ogImageUrl = `${new URL(
-    "/assets/og-images/star-search-og-image.png",
-    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-  )}`;
-
-  return { props: { userId, ogImageUrl } };
-}
-
 type StarSearchPageProps = {
-  userId: number;
   ogImageUrl: string;
 };
 
@@ -181,7 +162,7 @@ function StarSearchWidget({ widgetDefinition }: { widgetDefinition: WidgetDefini
   }
 }
 
-export default function StarSearchPage({ userId, ogImageUrl }: StarSearchPageProps) {
+export default function StarSearchPage() {
   const [starSearchState, setStarSearchState] = useState<"initial" | "chat">("initial");
   const [chat, setChat] = useState<StarSearchChat[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -194,6 +175,16 @@ export default function StarSearchPage({ userId, ogImageUrl }: StarSearchPagePro
   const { toast } = useToast();
   const { sessionToken: bearerToken } = useSupabaseAuth();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const ogImageUrl = `${new URL(
+    "/assets/og-images/star-search-og-image.png",
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  )}`;
+  const { user } = useSupabaseAuth();
+  let userId: number | undefined;
+
+  if (user?.user_metadata.sub) {
+    userId = Number(user?.user_metadata.sub);
+  }
 
   function registerPrompt(promptInput: StarSearchPromptAnalytic) {
     prompt({
