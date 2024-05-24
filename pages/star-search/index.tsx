@@ -76,6 +76,7 @@ function ChatAvatar({ author, userId }: ChatAvatarProps) {
         />
       );
     case author === "StarSearch":
+    default:
       return (
         <div className="bg-gradient-to-br from-sauced-orange to-amber-400 px-1.5 py-1 lg:p-2 rounded-full w-max">
           <Image
@@ -117,10 +118,6 @@ async function updateComponentRegistry(name: string) {
     );
   }
 }
-
-type StarSearchPageProps = {
-  ogImageUrl: string;
-};
 
 type StarSearchChat = { author: "You"; content: string } | { author: "StarSearch"; content: string | WidgetDefinition };
 

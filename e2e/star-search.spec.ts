@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test";
+import config from "../playwright.config";
 
 test("StarSearch (Logged Out Experience)", async ({ page }) => {
   await page.goto("/star-search");
+
+  const expectedUrl = `${config.use?.baseURL}/assets/og-images/star-search-og-image.png`;
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", expectedUrl);
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", expectedUrl);
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
 
   // Ensure all suggestions are present
   const firstSuggestsion = await page.getByRole("button", {
