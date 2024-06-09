@@ -1,7 +1,7 @@
 import Card from "components/atoms/Card/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "components/shared/Carousel";
 
-type SuggesionTypes = {
+export type SuggestionType = {
   title: string;
   prompt: string;
 };
@@ -13,7 +13,7 @@ export function SuggestedPrompts({
 }: {
   addPromptInput: (prompt: string) => void;
   isHorizontal?: boolean;
-  suggestions: SuggesionTypes[];
+  suggestions: SuggestionType[];
 }) {
   return isHorizontal ? (
     <Carousel className="w-fit max-w-[32rem] my-0 mx-auto px-auto md:ml-[1.63rem] lg:mx-auto" orientation="horizontal">

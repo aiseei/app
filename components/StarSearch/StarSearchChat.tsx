@@ -21,27 +21,8 @@ import { writeToClipboard } from "lib/utils/write-to-clipboard";
 import { ChatAvatar } from "./ChatAvatar";
 import { WidgetDefinition } from "./StarSearchWidget";
 import { Chatbox, StarSearchChatMessage } from "./Chatbox";
-import { SuggestedPrompts } from "./SuggestedPrompts";
+import { SuggestedPrompts, SuggestionType } from "./SuggestedPrompts";
 import { SharePromptMenu } from "./SharePromptMenu";
-
-const SUGGESTIONS = [
-  {
-    title: "Get information on contributor activity",
-    prompt: "What type of pull requests has @brandonroberts worked on?",
-  },
-  {
-    title: "Identify key contributors",
-    prompt: "Who are the most prevalent contributors to the TypeScript ecosystem?",
-  },
-  {
-    title: "Find contributors based on their work",
-    prompt: "Show me the lottery factor for contributors in the remix-run/react-router project?",
-  },
-  {
-    title: "Find experts",
-    prompt: "Who are the best developers that know Tailwind and are interested in Rust?",
-  },
-];
 
 const componentRegistry = new Map<string, React.ComponentType<any>>();
 
@@ -85,13 +66,22 @@ function getSharedPromptUrl(promptMessage: string | undefined) {
 }
 
 type StarSearchChatProps = {
+  streamUrl: string;
   userId: number | undefined;
   sharedPrompt: string | null;
   bearerToken: string | undefined | null;
   isMobile: boolean;
+  suggestions?: SuggestionType[];
 };
 
-export function StarSearchChat({ userId, sharedPrompt, bearerToken, isMobile }: StarSearchChatProps) {
+export function StarSearchChat({
+  streamUrl,
+  userId,
+  sharedPrompt,
+  bearerToken,
+  isMobile,
+  suggestions,
+}: StarSearchChatProps) {
   const [starSearchState, setStarSearchState] = useState<"initial" | "chat">("initial");
   const [chat, setChat] = useState<StarSearchChatMessage[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -209,9 +199,7 @@ export function StarSearchChat({ userId, sharedPrompt, bearerToken, isMobile }: 
       return temp;
     });
 
-    // get ReadableStream from API
-    const baseUrl = new URL(process.env.NEXT_PUBLIC_API_URL!);
-    const response = await fetch(`${baseUrl}/star-search/stream`, {
+    const response = await fetch(streamUrl, {
       method: "POST",
       body: JSON.stringify({
         query_text: prompt,
@@ -402,7 +390,9 @@ Need some ideas? Try hitting the **Need Inspiration?** button below!`;
             {sharedPrompt && !ranOnce ? null : (
               <>
                 <Header />
-                {isMobile ? null : <SuggestedPrompts addPromptInput={addPromptInput} suggestions={SUGGESTIONS} />}
+                {isMobile || !suggestions ? null : (
+                  <SuggestedPrompts addPromptInput={addPromptInput} suggestions={suggestions} />
+                )}
               </>
             )}
           </div>
@@ -509,7 +499,7 @@ Need some ideas? Try hitting the **Need Inspiration?** button below!`;
         {renderState()}
         <div className="sticky w-full bottom-2 md:bottom-4">
           {!isRunning &&
-            (isMobile ? (
+            (isMobile && suggestions ? (
               <Drawer
                 title="Choose a suggestion"
                 description="You can customize the prompt after selection"
@@ -524,11 +514,11 @@ Need some ideas? Try hitting the **Need Inspiration?** button below!`;
                   </button>
                 }
               >
-                <SuggestedPrompts addPromptInput={addPromptInput} suggestions={SUGGESTIONS} />
+                <SuggestedPrompts addPromptInput={addPromptInput} suggestions={suggestions} />
               </Drawer>
             ) : (
               <>
-                {!showSuggestions && ranOnce && (
+                {!showSuggestions && ranOnce && suggestions && (
                   <button
                     onClick={() => setShowSuggestions(!showSuggestions)}
                     className="mx-auto w-fit flex gap-1 shadow-xs items-center text-slate-700 font-medium bg-slate-100 !border-2 !border-slate-300 px-4 py-1 rounded-full mb-2 md:mb-4"
@@ -539,7 +529,7 @@ Need some ideas? Try hitting the **Need Inspiration?** button below!`;
                 )}
               </>
             ))}
-          {!isMobile && showSuggestions && (
+          {!isMobile && showSuggestions && suggestions && (
             <div className="relative flex flex-col gap-2 mx-auto mb-4 w-fit">
               <button
                 onClick={() => {
@@ -556,7 +546,7 @@ Need some ideas? Try hitting the **Need Inspiration?** button below!`;
                   addPromptInput(prompt);
                   setShowSuggestions(false);
                 }}
-                suggestions={SUGGESTIONS}
+                suggestions={suggestions}
               />
             </div>
           )}

@@ -28,11 +28,32 @@ type StarSearchPageProps = {
   sharedPrompt: string | null;
 };
 
+const STREAM_URL = `${process.env.NEXT_PUBLIC_API_URL!}/star-search/stream`;
+
 export default function StarSearchPage({ ogImageUrl, sharedPrompt }: StarSearchPageProps) {
   const { session } = useSession(true);
   const userId = session ? session.id : undefined;
   const { sessionToken: bearerToken } = useSupabaseAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const SUGGESTIONS = [
+    {
+      title: "Get information on contributor activity",
+      prompt: "What type of pull requests has @brandonroberts worked on?",
+    },
+    {
+      title: "Identify key contributors",
+      prompt: "Who are the most prevalent contributors to the TypeScript ecosystem?",
+    },
+    {
+      title: "Find contributors based on their work",
+      prompt: "Show me the lottery factor for contributors in the remix-run/react-router project?",
+    },
+    {
+      title: "Find experts",
+      prompt: "Who are the best developers that know Tailwind and are interested in Rust?",
+    },
+  ];
 
   return (
     <>
@@ -43,7 +64,14 @@ export default function StarSearchPage({ ogImageUrl, sharedPrompt }: StarSearchP
         twitterCard="summary_large_image"
       />
       <ProfileLayout showFooter={false}>
-        <StarSearchChat userId={userId} sharedPrompt={sharedPrompt} bearerToken={bearerToken} isMobile={isMobile} />
+        <StarSearchChat
+          streamUrl={STREAM_URL}
+          userId={userId}
+          sharedPrompt={sharedPrompt}
+          bearerToken={bearerToken}
+          isMobile={isMobile}
+          suggestions={SUGGESTIONS}
+        />
       </ProfileLayout>
     </>
   );
